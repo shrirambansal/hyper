@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper Chaotic Encryption Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            margin: 50px auto;
+            padding: 20px;
+            width: 50%;
+            background: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        textarea, input, button {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        button {
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-size: 16px;
+        }
+
+        footer{
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hyper Chaotic Encryption Tool</h1>
+        <textarea id="message" rows="5" placeholder="Enter your message..."></textarea><br>
+        <input id="key" type="text" placeholder="Enter key (float between 0 and 1)" /><br>
+        <button onclick="process('encrypt')">Encrypt</button>
+        <button onclick="process('decrypt')">Decrypt</button>
+        <button class="reset" onclick="resetForm()">Reset</button>
+        <p id="output-message" style="font-weight: bold; margin-top: 20px;"></p>
+        <p id="output-key" style="font-weight: bold; margin-top: 10px;"></p>
+        <p id="output-result" style="font-weight: bold; margin-top: 10px;"></p>
+        <a id="download-link" style="display: none; margin-top: 20px; color: #007bff; cursor: pointer;">Download Result</a>
+    </div>
+
+    <footer title="Created by Shriram Bansal | Email: shrirambansal13@gmail.com ">
+        &copy; 2025 Hyper Chaotic Encryption Tool. All rights reserved to <a href="https://www.linkedin.com/in/shrirambansal/">SRB</a>.
+    </footer>
+
+    <script>
+        function process(action) {
+            const message = document.getElementById('message').value;
+            const key = document.getElementById('key').value;
+
+            // Validate inputs
+            if (!message) {
+                alert("Please enter a message.");
+                return;
+            }
+            if (!key) {
+                alert("Please enter a key.");
+                return;
+            }
+
+            fetch('/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ action, message, key }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        // Show the message
+                        const outputMessage = document.getElementById('output-message');
+                        outputMessage.textContent = `Message: ${message}`;
+
+                        // Show the key with a delay
+                        setTimeout(() => {
+                            const outputKey = document.getElementById('output-key');
+                            outputKey.textContent = `Key: ${key}`;
+                        }, 1000);
+
+                        // Show the result with another delay
+                        setTimeout(() => {
+                            const outputResult = document.getElementById('output-result');
+                            outputResult.textContent = `Result: ${data.result}`;
+                            
+                            // Enable download link
+                            const downloadLink = document.getElementById('download-link');
+                            const blob = new Blob([data.result], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+                            downloadLink.href = url;
+                            downloadLink.download = 'result.txt';
+                            downloadLink.textContent = 'Download Result';
+                            downloadLink.style.display = 'block';
+                        }, 2000);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function resetForm() {
+            // Clear all input fields
+            document.getElementById('message').value = '';
+            document.getElementById('key').value = '';
+
+            // Clear outputs
+            document.getElementById('output-message').textContent = '';
+            document.getElementById('output-key').textContent = '';
+            document.getElementById('output-result').textContent = '';
+
+            // Hide download link
+            const downloadLink = document.getElementById('download-link');
+            downloadLink.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
