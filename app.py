@@ -2,6 +2,14 @@ from flask import Flask, render_template, request, jsonify
 
 app = Flask(__name__)
 
+@app.route('/health', methods=['GET'])
+def health_check():
+    """
+    A simple health check endpoint.
+    This endpoint will be pinged periodically to keep the app active.
+    """
+    return "OK", 200
+
 # Logistic map function to generate chaotic sequences
 def logistic_map(size, key):
     x = float(key)
